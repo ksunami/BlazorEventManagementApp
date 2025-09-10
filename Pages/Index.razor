@@ -1,0 +1,24 @@
+@page "/"
+@inject UserSessionService Session
+@inject NavigationManager Nav
+
+@if (Session.IsAuthenticated)
+{
+    <p class="text-muted">Redirecting to events…</p>
+}
+else
+{
+    <div class="p-4">
+        <h2>Welcome</h2>
+        <p>Please <NavLink href="/register">create your account</NavLink> to get started.</p>
+        <p>Or browse <NavLink href="/events">Events</NavLink>.</p>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (Session.IsAuthenticated)
+            Nav.NavigateTo("/events", replace: true);
+    }
+}

@@ -1,0 +1,25 @@
+@using Microsoft.AspNetCore.Components.Routing
+@using BlazorEventManagementApp.Shared
+
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">        
+        <ErrorBoundary>
+      <ChildContent>
+       <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+      </ChildContent>
+      <ErrorContent Context="ex">
+        <div style="border:1px solid #c00;padding:.75rem;margin:.5rem 0">
+          <h3>Component error</h3>
+          <p>@ex.Message</p>
+          <pre style="white-space:pre-wrap">@ex.StackTrace</pre>
+        </div>
+      </ErrorContent>
+    </ErrorBoundary>
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <h1>Sorry, there's nothing at this address.</h1>
+        </LayoutView>
+    </NotFound>
+</Router>

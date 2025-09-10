@@ -1,0 +1,27 @@
+@inject ToastService Toasts
+@implements IDisposable
+
+<div class="toast-stack">
+  @foreach (var t in Toasts.Items)
+  {
+    <div class="toast-neo">
+      @if (!string.IsNullOrEmpty(t.Icon))
+      {
+        <i class="bi @t.Icon me-1"></i>
+      }
+      @t.Message
+    </div>
+  }
+</div>
+
+@code {
+  protected override void OnInitialized()
+  {
+      Toasts.Changed += OnChanged;
+  }
+  private void OnChanged() => InvokeAsync(StateHasChanged);
+  public void Dispose()
+  {
+      Toasts.Changed -= OnChanged;
+  }
+}

@@ -1,0 +1,49 @@
+@implements IDisposable
+@inject UserSessionService Session
+@inject NavigationManager Nav
+
+<div class="session-tracker">
+    @if (Session.IsAuthenticated && Session.Identity is not null)
+    {
+        <span>Hi, <strong>@Session.Identity.DisplayName</strong></span>
+        <span class="sep">•</span>
+        <span>Last activity: @Session.LastActivityUtc?.ToLocalTime().ToString("g")</span>
+        <span class="sep">•</span>
+        <span>Last page: @Session.LastPage</span>
+        <span class="sep">•</span>
+        <a href="" @onclick="SignOut">Sign out</a>
+    }
+    else
+    {
+        <span>Not signed in</span>
+        <span class="sep">•</span>
+        <NavLink href="/register">Register</NavLink>
+    }
+</div>
+
+@code {
+    private bool _subscribed;
+    private EventHandler<LocationChangedEventArgs>? _navHandler;
+
+    protected override void OnInitialized()
+    {
+        if (_subscribed) return;
+
+        Session.OnChanged += OnSessionChanged;
+        _navHandler = (_, __) => { _ = Session.TrackNavigationAsync(Nav.Uri); };
+        Nav.LocationChanged += _navHandler;
+
+        _subscribed = true;
+    }
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Session.OnChanged -= OnSessionChanged;
+        if (_navHandler is not null)
+            Nav.LocationChanged -= _navHandler;
+    }
+
+    private async Task SignOut() => await Session.SignOutAsync();
+}

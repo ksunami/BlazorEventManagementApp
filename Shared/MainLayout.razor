@@ -1,0 +1,31 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Routing
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+        <div class="container">
+            <NavLink class="navbar-brand fw-semibold" href="/">
+                <span class="me-2">📅</span> Event Manager
+            </NavLink>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+               
+                <NavMenu />
+
+              
+                <div class="ms-auto">
+                    <SessionTracker />
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container py-4">
+    @Body
+</main>

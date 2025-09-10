@@ -1,0 +1,61 @@
+@page "/event-register"
+@using BlazorEventManagementApp.Models
+@inject BlazorEventManagementApp.Data.EventService EventService
+@inject NavigationManager Nav
+@inject ToastService Toasts
+
+<h3 class="mb-3"><i class="bi bi-plus-circle"></i> Register New Event</h3>
+
+<EditForm Model="@newEvent" OnValidSubmit="HandleValidSubmit">
+  <DataAnnotationsValidator />
+  <ValidationSummary class="mb-3" />
+
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="form-floating">
+        <InputText id="eventName" class="form-control" @bind-Value="newEvent.EventName" />
+        <label for="eventName">Event name</label>
+      </div>
+      <ValidationMessage For="@(() => newEvent.EventName)" />
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <InputDate id="eventDate" class="form-control" @bind-Value="newEvent.Date" />
+        <label for="eventDate">Date</label>
+      </div>
+      <ValidationMessage For="@(() => newEvent.Date)" />
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-floating">
+        <InputText id="eventLocation" class="form-control" @bind-Value="newEvent.Location" />
+        <label for="eventLocation">Location</label>
+      </div>
+      <ValidationMessage For="@(() => newEvent.Location)" />
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-check2-circle"></i> Save
+    </button>
+    <button type="button" class="btn btn-outline-secondary" @onclick="ResetForm">
+      <i class="bi bi-arrow-counterclockwise"></i> Reset
+    </button>
+  </div>
+</EditForm>
+
+@code {
+  private Event newEvent = new() { Date = DateTime.Today };
+
+  private async Task HandleValidSubmit()
+  {
+    await EventService.AddAsync(newEvent);
+    Toasts.Success($"“{newEvent.EventName}” created");
+    newEvent = new() { Date = DateTime.Today }; 
+    Nav.NavigateTo("/events");
+  }
+
+  private void ResetForm() => newEvent = new() { Date = DateTime.Today };
+}

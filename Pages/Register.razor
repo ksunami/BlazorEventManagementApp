@@ -1,0 +1,263 @@
+@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using BlazorEventManagementApp.Models
+@inject NavigationManager Nav
+@inject UserSessionService Session
+@inject ILogger<Register> Logger
+@implements IDisposable
+
+<ErrorBoundary>
+    <ChildContent>
+    <div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm p-4">
+                 <h3 class="mb-4">Create account</h3>
+
+<EditForm @key="_editContext" EditContext="_editContext" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger mb-3" />
+
+    @if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+
+    <div class="mb-3">
+  <label for="firstName" class="form-label">First name</label>
+  <InputText id="firstName" class="form-control"          
+             ValueChanged="OnFirstNameChanged"
+             ValueExpression="() => _model.FirstName"
+             autocomplete="given-name" />
+  <ValidationMessage For="@(() => _model.FirstName)" class="text-danger" />
+</div>
+
+<div class="mb-3">
+  <label for="lastName" class="form-label">Last name</label>
+  <InputText id="lastName" class="form-control"            
+             ValueChanged="OnLastNameChanged"
+             ValueExpression="() => _model.LastName"
+             autocomplete="family-name" />
+  <ValidationMessage For="@(() => _model.LastName)" class="text-danger" />
+</div>
+
+<div class="mb-3">
+  <label for="email" class="form-label">Email</label>
+  <InputText id="email" type="email" class="form-control"           
+             ValueChanged="OnEmailChanged"
+             ValueExpression="() => _model.Email"
+             autocomplete="email" />
+  <ValidationMessage For="@(() => _model.Email)" class="text-danger" />
+</div>
+
+<div class="mb-3">
+  <label for="password" class="form-label">Password</label>
+  <InputText id="password" type="password" class="form-control"           
+             ValueChanged="OnPasswordChanged"
+             ValueExpression="() => _model.Password"
+             autocomplete="new-password" />
+  <ValidationMessage For="@(() => _model.Password)" class="text-danger" />
+</div>
+
+<div class="mb-3">
+  <label for="confirm" class="form-label">Confirm password</label>
+  <InputText id="confirm" type="password" class="form-control"            
+             ValueChanged="OnConfirmChanged"
+             ValueExpression="() => _model.ConfirmPassword"
+             autocomplete="new-password" />
+  <ValidationMessage For="@(() => _model.ConfirmPassword)" class="text-danger" />
+</div>
+
+<div class="form-check mb-3">
+  <InputCheckbox id="terms" class="form-check-input"                
+                 ValueChanged="OnTermsChanged"
+                 ValueExpression="() => _model.AcceptTerms" />
+  <label for="terms" class="form-check-label">I accept the terms</label>
+  <ValidationMessage For="@(() => _model.AcceptTerms)" class="text-danger" />
+</div>
+
+<button type="submit" class="btn btn-primary w-100" disabled="@IsInvalid">
+  @(_isSubmitting ? "Creating..." : "Create account")
+</button>
+   
+</EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+      
+
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <h4>Register failed</h4>
+        <p>@ex.Message</p>
+        <pre>@ex.StackTrace</pre>
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+    
+    private readonly UserRegistration _model = new();
+    private readonly EditContext _editContext;
+
+    private string? _error;
+    private bool _isSubmitting;
+    private bool _hasErrors;
+    private bool _disposed;
+
+   
+    private EventHandler<ValidationStateChangedEventArgs>? _onValidationChanged;
+    private EventHandler<ValidationRequestedEventArgs>? _onValidationRequested;
+    
+   
+private void Notify(string fieldName)
+    => _editContext.NotifyFieldChanged(new FieldIdentifier(_model, fieldName));
+
+
+private void OnFirstNameChanged(string value)
+{
+    _model.FirstName = value;
+    Notify(nameof(UserRegistration.FirstName));
+}
+
+
+private void OnLastNameChanged(string value)
+{
+    _model.LastName = value;
+    Notify(nameof(UserRegistration.LastName));
+}
+
+
+private void OnEmailChanged(string value)
+{
+    _model.Email = value?.Trim() ?? string.Empty; // pequeño saneo opcional
+    Notify(nameof(UserRegistration.Email));
+}
+
+
+private void OnPasswordChanged(string value)
+{
+    _model.Password = value ?? string.Empty;
+    Notify(nameof(UserRegistration.Password));
+
+   
+    Notify(nameof(UserRegistration.ConfirmPassword));
+}
+
+
+private void OnConfirmChanged(string value)
+{
+    _model.ConfirmPassword = value ?? string.Empty;
+    Notify(nameof(UserRegistration.ConfirmPassword));
+}
+
+
+private void OnTermsChanged(bool value)
+{
+    _model.AcceptTerms = value;
+    Notify(nameof(UserRegistration.AcceptTerms));
+}
+
+
+private bool IsInvalid =>
+    _isSubmitting
+    || _editContext is null
+    || _editContext.GetValidationMessages().Any()
+    || !_model.AcceptTerms;
+
+    public Register()
+    {
+        _editContext = new EditContext(_model);
+       
+    }
+
+    protected override void OnInitialized()
+    {
+        
+        Logger.LogInformation("OnInitialized: model={Model} ctx={Ctx}",
+            _model.GetHashCode(), _editContext.GetHashCode());
+
+        _onValidationChanged = (s, e) =>
+        {
+            _hasErrors = _editContext.GetValidationMessages().Any();
+            Logger.LogDebug("OnValidationStateChanged: hasErrors={HasErrors}, messages={Count}",
+                _hasErrors, _editContext.GetValidationMessages().Count());
+            if (!_disposed) InvokeAsync(StateHasChanged);
+        };
+
+        _onValidationRequested = (s, e) =>
+        {
+            Logger.LogDebug("OnValidationRequested (submit/force validate)");
+        };
+
+        
+
+        _editContext.OnValidationStateChanged += _onValidationChanged;
+        _editContext.OnValidationRequested += _onValidationRequested;        
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Logger.LogDebug("OnAfterRender (first={First}) snapshot={@Snap}",
+            firstRender, Snapshot());
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+
+        if (_onValidationChanged is not null)
+            _editContext.OnValidationStateChanged -= _onValidationChanged;
+        if (_onValidationRequested is not null)
+            _editContext.OnValidationRequested -= _onValidationRequested;
+        
+        Logger.LogInformation("Dispose");
+    }
+
+    private async Task HandleSubmit()
+    {
+        _error = null;
+        _isSubmitting = true;
+        Logger.LogInformation("HandleSubmit: snapshot(before)={@Snap}", Snapshot());
+
+        try
+        {
+            await Session.SignInAsync(new UserIdentity
+            {
+                UserId = Guid.NewGuid().ToString("N"),
+                Email = _model.Email,
+                DisplayName = $"{_model.FirstName} {_model.LastName}"
+            });
+
+            Logger.LogInformation("SignIn OK");
+            Nav.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            _error = "We couldn’t complete your registration. Please try again.";
+            Logger.LogError(ex, "HandleSubmit ERROR");
+        }
+        finally
+        {
+            _isSubmitting = false;
+            Logger.LogInformation("HandleSubmit: snapshot(after)={@Snap}", Snapshot());
+        }
+    }
+
+    private void LogInputBlur(string field, string? value)
+        => Logger.LogDebug("BLUR: {Field} -> {Value}", field, value);
+
+    private static string Mask(string? s)
+        => string.IsNullOrEmpty(s) ? "" : new string('•', Math.Min(s.Length, 12));
+
+    private object Snapshot() => new
+    {
+        FirstName = _model.FirstName,
+        LastName  = _model.LastName,
+        Email     = _model.Email,
+        Password  = Mask(_model.Password),
+        Confirm   = Mask(_model.ConfirmPassword),
+        Terms     = _model.AcceptTerms,
+        HasErrors = _hasErrors
+    };
+}

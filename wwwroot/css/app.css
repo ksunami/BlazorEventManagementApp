@@ -1,0 +1,106 @@
+:root{
+  --bg: #0b1220;
+  --card: #101827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --primary: #6366f1; /* indigo-500 */
+  --primary-600: #5458e0;
+  --ring: #93c5fd;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --radius: 14px;
+}
+
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#475569;
+    --primary:#4f46e5;
+    --primary-600:#4338ca;
+    --ring:#2563eb;
+  }
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+a { color: var(--primary); }
+a:hover { color: var(--primary-600); }
+
+.container-narrow {
+  max-width: 900px;
+  margin-inline: auto;
+  padding: clamp(12px,2vw,24px);
+}
+
+.card-neo{
+  background: var(--card);
+  border: 1px solid color-mix(in oklab, var(--card) 85%, var(--text));
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+}
+
+.card-neo .card-header{
+  border-bottom: 1px solid color-mix(in oklab, var(--card) 75%, var(--text));
+  background: transparent;
+}
+
+.btn-primary{
+  background: linear-gradient(180deg, var(--primary), var(--primary-600));
+  border: none;
+}
+.btn-primary:hover{ filter: brightness(1.05); }
+
+.form-floating > label { color: var(--muted); }
+.form-control, .form-select {
+  background: transparent;
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--card) 60%, var(--text));
+}
+.form-control:focus{
+  border-color: var(--ring);
+  box-shadow: 0 0 0 .2rem color-mix(in oklab, var(--ring) 30%, transparent);
+}
+
+.validation-summary-valid { display:none; }
+.validation-message, .text-danger { color: var(--danger) !important; }
+
+.list-group-item{
+  background: transparent;
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--card) 60%, var(--text));
+}
+
+.badge-date{
+  background: color-mix(in oklab, var(--primary) 20%, transparent);
+  color: var(--text);
+  border: 1px solid var(--primary-600);
+}
+
+.navbar-blur{
+  backdrop-filter: saturate(180%) blur(10px);
+  background: color-mix(in oklab, var(--bg) 60%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--card) 70%, var(--text));
+}
+
+/* Toast container */
+.toast-stack{
+  position: fixed;
+  inset: 16px 16px auto auto;
+  z-index: 1080;
+  display: grid;
+  gap: 12px;
+}
+.toast-neo{
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid color-mix(in oklab, var(--card) 70%, var(--text));
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  box-shadow: 0 8px 18px rgba(0,0,0,.25);
+}
