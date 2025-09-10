@@ -71,15 +71,15 @@ Then open [http://localhost:5000](http://localhost:5000) 🚀
 ## 🖼️ Screenshots
 
 ### 🔐 Register Page
-![Welcome Page](https://raw.githubusercontent.com/ksunami/BlazorEventManagementApp/main/docs/screenshots/welcome.png)
+![Welcome Page](https://github.com/ksunami/blazor-event-management-app/blob/main/docs/screenshots/welcome.png)
 
-![Register Page](https://raw.githubusercontent.com/ksunami/BlazorEventManagementApp/main/docs/screenshots/register.png)
+![Register Page](https://github.com/ksunami/blazor-event-management-app/blob/main/docs/screenshots/register.png)
 
 ### 📅 Events Page
-![Events Page](https://raw.githubusercontent.com/ksunami/BlazorEventManagementApp/main/docs/screenshots/events.png)
+![Events Page](https://github.com/ksunami/blazor-event-management-app/blob/main/docs/screenshots/events.png)
 
 ### 📝 Event Card
-![Event Card](https://raw.githubusercontent.com/ksunami/BlazorEventManagementApp/main/docs/screenshots/eventcard.png)
+![Event Card](https://github.com/ksunami/blazor-event-management-app/blob/main/docs/screenshots/eventcard.png)
 
 
 ---
